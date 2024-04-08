@@ -533,16 +533,21 @@ module Pod
 
       # Install pods, which includes downloading only if parallel_pod_downloads is set to false
       sorted_root_specs.each do |spec|
+        pod_installer = create_pod_installer(spec.name)
+
         if pods_to_install.include?(spec.name)
           title = section_title(spec, 'Installing')
           UI.titled_section(title.green, title_options) do
-            install_source_of_pod(spec.name)
+            install_source_of_pod(pod_installer)
           end
         else
           UI.section("Using #{spec}", title_options[:verbose_prefix]) do
-            create_pod_installer(spec.name)
+
           end
         end
+
+        UI.section("Running Prepare Command for #{spec}", title_options[:verbose_prefix])
+        pod_installer.prepare!
       end
     end
 
@@ -616,8 +621,7 @@ module Pod
     #
     # @return [void]
     #
-    def install_source_of_pod(pod_name)
-      pod_installer = create_pod_installer(pod_name)
+    def install_source_of_pod(pod_installer)
       pod_installer.install!
       @installed_specs.concat(pod_installer.specs_by_platform.values.flatten.uniq)
     end

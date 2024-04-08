@@ -65,8 +65,12 @@ module Pod
       #
       def install!
         download_source unless predownloaded? || local?
-        PodSourcePreparer.new(root_spec, root).prepare! if local?
+        prepare!
         sandbox.remove_local_podspec(name) unless predownloaded? || local? || external?
+      end
+
+      def prepare!
+        PodSourcePreparer.new(root_spec, root).prepare! if local?
       end
 
       # Cleans the installations if appropriate.
